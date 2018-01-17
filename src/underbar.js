@@ -208,6 +208,10 @@
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
+    iterator = iterator || _.identity;
+    return !!_.reduce(collection, function(match, item) {
+      return match && iterator(item);
+    }, true);
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
@@ -236,11 +240,27 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    _.each(arguments, function(argObj) {
+      _.each(argObj, function(value, key) {
+        obj[key] = value;
+      });
+    });
+
+    return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    _.each(arguments, function(argObj) {
+      _.each(argObj, function(value, key) {
+        if (!obj.hasOwnProperty(key)) {
+          obj[key] = value;
+        }
+      });
+    });
+
+    return obj;
   };
 
 
@@ -284,7 +304,19 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var results;
+    //var check = false;
+    
+    if (results === undefined) {
+      return function() {
+        results = func();
+        
+      };
+    }   
+
+    return results;
   };
+
 
   // Delays a function for the given number of milliseconds, and then calls
   // it with the arguments supplied.
@@ -293,6 +325,10 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    var args = Array.from(arguments).slice(2);
+    setInterval(function () {
+      func.apply(null, args);
+    }, wait); 
   };
 
 
@@ -307,6 +343,19 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    var randomized = [];
+    var obj = {};
+   
+    while (randomized.length !== array.length) {
+      var random = Math.floor(Math.random() * array.length);
+      if (!obj.hasOwnProperty(random)) {
+        randomized.push(array[random]);
+      } 
+
+      obj[random] = array[random];
+    }
+
+    return randomized;
   };
 
 
