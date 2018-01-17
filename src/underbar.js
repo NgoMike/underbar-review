@@ -94,10 +94,32 @@
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
+    var rejected = [];
+    var filtered = _.filter(collection, test);
+    _.each(collection, function (item) {
+      if (!filtered.includes(item)) {
+        rejected.push(item);
+      }
+    });
+    
+    return rejected;
   };
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array, isSorted, iterator) {
+    var unique = [];
+    var check = [];
+    isSorted = true;
+
+    _.filter (array, function(item) {
+      var iterated = (iterator !== undefined) ? iterator(item) : item;
+      if (!check.includes(iterated)) {
+        unique.push(item);
+      }
+      check.push(iterated);
+    });
+
+    return unique;
   };
 
 
@@ -106,6 +128,14 @@
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
+    var mapped = [];
+
+    _.each(collection, function (item) {
+      var values = iterator(item);
+      mapped.push(values);
+    });
+    
+    return mapped;
   };
 
   /*
@@ -147,6 +177,19 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
+    // var initializing = (accumulator !== undefined) ? accumulator : collection[0];
+    var initializing = accumulator === undefined;
+   
+    _.each(collection, function(item) {
+      if (initializing) {
+        accumulator = item;
+        initializing = false;
+      } else {
+        accumulator = iterator(accumulator, item);
+      }
+    });
+
+    return accumulator;
   };
 
   // Determine if the array or object contains a given value (using `===`).
