@@ -218,6 +218,10 @@
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+    iterator = iterator || _.identity;
+    return !!_.reduce(collection, function(match, item) {
+      return match || iterator(item);
+    }, false);
   };
 
 
@@ -304,17 +308,16 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
-    var results;
-    //var check = false;
-    
-    if (results === undefined) {
-      return function() {
-        results = func();
-        
-      };
-    }   
-
-    return results;
+    var storage = {};
+  
+    return function() {
+      var arg = JSON.stringify(arguments);
+      if (!storage[arg]) {
+        storage[arg] = func.apply(this, arguments);
+      }
+      
+      return storage[arg];
+    };
   };
 
 
